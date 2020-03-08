@@ -21,7 +21,7 @@ public class Overlay {
         fieldManager = new FieldGraphManager();
         splineManager = new SplineManager();
 
-        splineManager.addSpline(new CubicController());
+        splineManager.addSpline(new QuinticController());
     }
 
     public void updateAll(SpriteBatch batch, CameraController worldCam, CameraController hudCam) {

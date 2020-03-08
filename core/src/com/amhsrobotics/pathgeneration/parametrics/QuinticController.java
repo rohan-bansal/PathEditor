@@ -8,6 +8,8 @@ import com.amhsrobotics.pathgeneration.parametrics.libraries.PathGenerator;
 import com.amhsrobotics.pathgeneration.positioning.Handle;
 import com.amhsrobotics.pathgeneration.positioning.library.Transform;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -22,6 +24,7 @@ public class QuinticController extends SplineController {
     private ArrayList<Transform> transforms;
     private ArrayList<Vector2> currentSpline;
     private ArrayList<Handle> splineHandles;
+    private Sprite[] addSegments = new Sprite[2];
 
     private Path path;
 
@@ -37,6 +40,9 @@ public class QuinticController extends SplineController {
         }
 
         generate();
+
+        addSegments[0] = new Sprite(new Texture("buttons/add-segment.png"));
+        addSegments[1] = new Sprite(new Texture("buttons/add-segment.png"));
     }
 
     public QuinticController() {
@@ -78,6 +84,14 @@ public class QuinticController extends SplineController {
         for(Handle h : splineHandles) {
             h.render(batch, cam);
         }
+
+        for(int x = 0; x < addSegments.length; x++) {
+            addSegments[x].draw(batch);
+        }
+
+        addSegments[0].setCenter((float) path.getStartWaypoint().getPosition().getX() + 30, (float) path.getStartWaypoint().getPosition().getY());
+        addSegments[1].setCenter((float) path.getEndWaypoint().getPosition().getX() - 30, (float) path.getEndWaypoint().getPosition().getY());
+
         batch.end();
     }
 
