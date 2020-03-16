@@ -1,7 +1,9 @@
 package com.amhsrobotics.pathgeneration.field;
 
+import com.amhsrobotics.pathgeneration.Overlay;
 import com.amhsrobotics.pathgeneration.cameramechanics.CameraController;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -29,6 +31,17 @@ public class FieldGraphManager {
         field.draw(batch);
 
         batch.end();
+
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            Overlay.splineSelected = 0;
+        }
+
+        if(Overlay.splineSelected == 0) {
+            Overlay.panel.hide();
+        } else {
+            Overlay.panel.show();
+        }
     }
 
     public float getPixelWidth() {

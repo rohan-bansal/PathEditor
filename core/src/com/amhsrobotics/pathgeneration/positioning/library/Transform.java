@@ -202,6 +202,14 @@ public class Transform {
         this.position = position;
     }
 
+    public void setX(float x) {
+        this.position.setX(x);
+    }
+
+    public void setY(float y) {
+        this.position.setY(y);
+    }
+
     public Rotation getRotation() {
         return rotation;
     }

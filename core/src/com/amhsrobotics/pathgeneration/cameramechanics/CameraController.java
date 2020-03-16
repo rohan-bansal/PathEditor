@@ -30,7 +30,7 @@ public class CameraController {
 
         if(!isUI && pan) {
             if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-                camera.translate(-Gdx.input.getDeltaX() * 13, Gdx.input.getDeltaY() * 13);
+                camera.translate(-Gdx.input.getDeltaX() * 7, Gdx.input.getDeltaY() * 7);
                 camera.update();
             }
         }
@@ -45,25 +45,6 @@ public class CameraController {
         this.pan = pan;
     }
 
-/*    public void fixBounds() {
-        float viewportWidth = camera.viewportWidth;
-        float viewportHeight = camera.viewportHeight;
-
-        float scaledViewportWidthHalfExtent = viewportWidth * camera.zoom * 0.5f;
-        float scaledViewportHeightHalfExtent = viewportHeight * camera.zoom * 0.5f;
-
-        // Horizontal
-        if (camera.position.x < scaledViewportWidthHalfExtent)
-            camera.position.x = scaledViewportWidthHalfExtent;
-        else if (camera.position.x > map.getPixelWidth() - scaledViewportWidthHalfExtent)
-            camera.position.x = map.getPixelWidth() - scaledViewportWidthHalfExtent;
-
-        // Vertical
-        if (camera.position.y < scaledViewportHeightHalfExtent)
-            camera.position.y = scaledViewportHeightHalfExtent;
-        else if (camera.position.y > map.getPixelHeight() - scaledViewportHeightHalfExtent)
-            camera.position.y = map.getPixelHeight() - scaledViewportHeightHalfExtent;
-    }*/
 
     public OrthographicCamera getCamera() {
         return camera;

@@ -1,21 +1,27 @@
 package com.amhsrobotics.pathgeneration.parametrics;
 
+import com.amhsrobotics.pathgeneration.Overlay;
 import com.amhsrobotics.pathgeneration.cameramechanics.CameraController;
-import com.amhsrobotics.pathgeneration.field.FieldConstants;
+import com.amhsrobotics.pathgeneration.headsup.SplineProperties;
 import com.amhsrobotics.pathgeneration.parametrics.abstractions.SplineController;
 import com.amhsrobotics.pathgeneration.parametrics.libraries.Path;
 import com.amhsrobotics.pathgeneration.parametrics.libraries.PathGenerator;
 import com.amhsrobotics.pathgeneration.positioning.Handle;
 import com.amhsrobotics.pathgeneration.positioning.library.Transform;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
+import javax.xml.transform.Transformer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TreeMap;
 
 public class QuinticController extends SplineController {
 
@@ -25,32 +31,43 @@ public class QuinticController extends SplineController {
     private ArrayList<Vector2> currentSpline;
     private ArrayList<Handle> splineHandles;
     private Sprite[] addSegments = new Sprite[2];
+    private ArrayList<Sprite> removeSegments;
 
     private Path path;
+    private SplineProperties properties;
+
+    public String[] fields = new String[] {"X Position", "Y Position", "Heading"};
 
     public QuinticController(Transform[] transforms) {
         this.transforms = new ArrayList<>();
         this.currentSpline = new ArrayList<>();
         this.splineHandles = new ArrayList<>();
+        this.removeSegments = new ArrayList<>();
 
         this.transforms.addAll(Arrays.asList(transforms));
-
-        for(Transform t : this.transforms) {
-            splineHandles.add(new Handle(t, this));
-        }
-
-        generate();
-
         addSegments[0] = new Sprite(new Texture("buttons/add-segment.png"));
         addSegments[1] = new Sprite(new Texture("buttons/add-segment.png"));
+
+        properties = new SplineProperties(this, fields);
+
+        refreshHandles();
+        generate();
     }
 
     public QuinticController() {
-        this(new Transform[] {
-                new Transform(FieldConstants.getImaginaryVector(new Vector2(0f, -67.25f)).x, FieldConstants.getImaginaryVector(new Vector2(0f, -67.25f)).y, 180),
-                new Transform(FieldConstants.getImaginaryVector(new Vector2(-86.63f, -134.155f)).x, FieldConstants.getImaginaryVector(new Vector2(-86.63f, -134.155f)).y, 180),
-                new Transform(FieldConstants.getImaginaryVector(new Vector2(-259.49f, -134.155f)).x, FieldConstants.getImaginaryVector(new Vector2(-259.49f, -134.155f)).y, 180)
-        });
+        this(ParametricConstants.STARTING_POINTS_QUINTIC);
+    }
+
+    private void refreshHandles() {
+        splineHandles.clear();
+        removeSegments.clear();
+        for(Transform t : this.transforms) {
+            splineHandles.add(new Handle(t, this));
+
+            Sprite s = new Sprite(new Texture("buttons/remove-segment.png"));
+            s.setCenter((float) t.getPosition().getX() + 30, (float) t.getPosition().getY() - 8);
+            removeSegments.add(s);
+        }
     }
 
     @Override
@@ -81,18 +98,59 @@ public class QuinticController extends SplineController {
         batch.setProjectionMatrix(cam.getCamera().combined);
         batch.begin();
 
+        if(Overlay.splineSelected == getID()) {
+            drawHandles(batch, cam);
+        }
+        batch.end();
+    }
+
+    private void drawHandles(SpriteBatch batch, CameraController cam) {
+
+        Vector3 unproj = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        cam.getCamera().unproject(unproj);
+
         for(Handle h : splineHandles) {
             h.render(batch, cam);
         }
 
         for(int x = 0; x < addSegments.length; x++) {
             addSegments[x].draw(batch);
+
+            if(addSegments[x].getBoundingRectangle().contains(unproj.x, unproj.y)  && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                Transform t;
+                if(x == 0) {
+                    t = new Transform(path.getStartWaypoint().getPosition().getX() + 100, path.getStartWaypoint().getPosition().getY(), 180);
+                    addSegment(0, t);
+                } else {
+                    t = new Transform(path.getEndWaypoint().getPosition().getX() - 100, path.getEndWaypoint().getPosition().getY(), 180);
+                    addSegment(this.transforms.size(), t);
+                }
+                generate();
+            }
         }
 
-        addSegments[0].setCenter((float) path.getStartWaypoint().getPosition().getX() + 30, (float) path.getStartWaypoint().getPosition().getY());
-        addSegments[1].setCenter((float) path.getEndWaypoint().getPosition().getX() - 30, (float) path.getEndWaypoint().getPosition().getY());
+        for(int x = 0; x < this.transforms.size(); x++) {
+            if(this.transforms.get(x) != null) {
+                if(x == 0) {
+                    removeSegments.get(x).setCenter((float) this.transforms.get(x).getPosition().getX() + 30, (float) this.transforms.get(x).getPosition().getY() - 8);
+                } else if(x == this.transforms.size() - 1) {
+                    removeSegments.get(x).setCenter((float) this.transforms.get(x).getPosition().getX() - 30, (float) this.transforms.get(x).getPosition().getY() - 8);
+                } else {
+                    removeSegments.get(x).setCenter((float) this.transforms.get(x).getPosition().getX(), (float) this.transforms.get(x).getPosition().getY() + 30);
+                }
+                removeSegments.get(x).draw(batch);
+                if(removeSegments.get(x).getBoundingRectangle().contains(unproj.x, unproj.y) && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                    if(this.transforms.size() != 2) {
+                        this.removeSegment(x);
+                    }
+                }
+            }
 
-        batch.end();
+        }
+
+        addSegments[0].setCenter((float) path.getStartWaypoint().getPosition().getX() + 30, (float) path.getStartWaypoint().getPosition().getY() + 8);
+        addSegments[1].setCenter((float) path.getEndWaypoint().getPosition().getX() - 30, (float) path.getEndWaypoint().getPosition().getY() + 8);
+
     }
 
     @Override
@@ -105,7 +163,69 @@ public class QuinticController extends SplineController {
     }
 
     @Override
+    public String getName() {
+        return "Quintic Hermite";
+    }
+
+    @Override
     public ArrayList<Handle> getHandles() {
         return splineHandles;
+    }
+
+    @Override
+    public void removeSegment(int index) {
+        this.transforms.remove(index);
+        this.splineHandles.remove(index);
+        refreshHandles();
+        generate();
+    }
+
+    @Override
+    public void addSegment(int index, Transform t) {
+        this.transforms.add(index, t);
+        this.splineHandles.add(new Handle(t, this));
+
+        Sprite s = new Sprite(new Texture("buttons/remove-segment.png"));
+        s.setCenter((float) t.getPosition().getX() + 30, (float) t.getPosition().getY() - 8);
+        removeSegments.add(s);
+    }
+
+    @Override
+    public Vector2 getCenter() {
+        return new Vector2((float) this.path.getPosition(0.5).getX(), (float) this.path.getPosition(0.5).getY());
+    }
+
+    @Override
+    public void resetHandles() {
+        for(Handle h : splineHandles) {
+            h.setAll();
+        }
+    }
+
+    @Override
+    public SplineProperties getProperties() {
+        return properties;
+    }
+
+    @Override
+    public Path getPath() {
+        return path;
+    }
+
+    @Override
+    public void drawProperties(SpriteBatch batch, CameraController cam) {
+        this.properties.render(batch, cam);
+    }
+
+    @Override
+    public Transform getTransform(int index) {
+        return transforms.get(index);
+    }
+
+    @Override
+    public void setHandleToTransform() {
+        for(Handle h : splineHandles) {
+            h.setAllReverse();
+        }
     }
 }
