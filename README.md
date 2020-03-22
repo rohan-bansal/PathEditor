@@ -19,11 +19,18 @@ Java version recommended: `1.8`
 #### Windows
 
 1. Clone repository
-2. Run `gradlew build` then `gradlew run`
+
+Run `gradlew build` then `gradlew run`
+
+OR
+
+Go to the `libs/output-windows` folder and run the EXE
 
 #### Mac/Linux
 
 1. Clone repository
 2. Run `./gradlew build` then `./gradlew run`
+
+Go to the `libs/output-[mac/linux]` folder and run the respective executable
 
 There is a universal jar file located in `build/libs` that can be run with `java -jar jarfile.jar` as well.
