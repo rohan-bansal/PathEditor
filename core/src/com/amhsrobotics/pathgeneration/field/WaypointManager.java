@@ -56,6 +56,7 @@ public class WaypointManager {
                 } else if(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
                     for(int x = 0; x < waypoints.size(); x++) {
                         if(waypoints.get(x).getRect().contains(unproj.x, unproj.y)) {
+                            Overlay.waypointSelected = 0;
                             waypoints.remove(x);
                         }
                     }
