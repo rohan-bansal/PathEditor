@@ -1,4 +1,4 @@
-# PathGeneration
+# 1351 Path Editor
 
 _Follow as [changes](https://trello.com/b/EOfeD5tU/path-planner-gui) are made_
 
