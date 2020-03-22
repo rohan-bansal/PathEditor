@@ -221,7 +221,7 @@ public class Transform {
     @Override
     public String toString() {
         return String.format("new Transform(new %s, new %s)", position.toString(), rotation.toString());
-}
+    }
 
     @Override
     public boolean equals(Object obj) {

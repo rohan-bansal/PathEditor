@@ -5,6 +5,8 @@ import com.amhsrobotics.pathgeneration.headsup.SplineProperties;
 import com.amhsrobotics.pathgeneration.parametrics.libraries.Path;
 import com.amhsrobotics.pathgeneration.positioning.Handle;
 import com.amhsrobotics.pathgeneration.positioning.library.Transform;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -33,13 +35,15 @@ public abstract class SplineController {
 
     public abstract void resetHandles();
 
-    public abstract SplineProperties getProperties();
-
-    public abstract Path getPath();
-
     public abstract void drawProperties(SpriteBatch batch, CameraController cam);
 
     public abstract Transform getTransform(int index);
 
     public abstract void setHandleToTransform();
+
+    public abstract ArrayList<Transform> getTransforms();
+
+    public abstract void writeTo(FileHandle file);
+
+    public abstract void setColor(Color color);
 }

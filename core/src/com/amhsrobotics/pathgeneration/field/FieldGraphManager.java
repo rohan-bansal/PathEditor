@@ -35,9 +35,10 @@ public class FieldGraphManager {
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             Overlay.splineSelected = 0;
+            Overlay.waypointSelected = 0;
         }
 
-        if(Overlay.splineSelected == 0) {
+        if(Overlay.splineSelected == 0 && Overlay.waypointSelected == 0) {
             Overlay.panel.hide();
         } else {
             Overlay.panel.show();

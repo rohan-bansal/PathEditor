@@ -102,6 +102,17 @@ public class Panel {
                 layout.setText(font, "ID: " + Overlay.splineManager.getSplineByID(Overlay.splineSelected).getID());
                 font.draw(batch, "ID: " + Overlay.splineManager.getSplineByID(Overlay.splineSelected).getID(), (Gdx.graphics.getWidth() - currentWidth.x + (currentWidth.x / 2)) - layout.width / 2, Gdx.graphics.getHeight() - 110);
 
+            } else if(Overlay.waypointSelected > 0) {
+                font.setColor(Color.GOLDENROD);
+                font.getData().setScale(0.7f);
+
+                layout.setText(font, "Waypoint");
+                font.draw(batch, "Waypoint", (Gdx.graphics.getWidth() - currentWidth.x + (currentWidth.x / 2)) - layout.width / 2, Gdx.graphics.getHeight() - 80);
+
+                font.getData().setScale(0.6f);
+                layout.setText(font, "ID: " + Overlay.waypointManager.getWaypointByID(Overlay.waypointSelected).getID());
+                font.draw(batch, "ID: " + Overlay.waypointManager.getWaypointByID(Overlay.waypointSelected).getID(), (Gdx.graphics.getWidth() - currentWidth.x + (currentWidth.x / 2)) - layout.width / 2, Gdx.graphics.getHeight() - 110);
+
             }
         } else {
             font.setColor(Color.SALMON);

@@ -2,6 +2,7 @@ package com.amhsrobotics.pathgeneration.parametrics;
 
 import com.amhsrobotics.pathgeneration.Overlay;
 import com.amhsrobotics.pathgeneration.cameramechanics.CameraController;
+import com.amhsrobotics.pathgeneration.field.FieldConstants;
 import com.amhsrobotics.pathgeneration.headsup.SplineProperties;
 import com.amhsrobotics.pathgeneration.parametrics.abstractions.SplineController;
 import com.amhsrobotics.pathgeneration.parametrics.libraries.Path;
@@ -10,6 +11,7 @@ import com.amhsrobotics.pathgeneration.positioning.Handle;
 import com.amhsrobotics.pathgeneration.positioning.library.Transform;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -18,10 +20,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-import javax.xml.transform.Transformer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.TreeMap;
 
 public class QuinticController extends SplineController {
 
@@ -37,6 +37,7 @@ public class QuinticController extends SplineController {
     private SplineProperties properties;
 
     public String[] fields = new String[] {"X Position", "Y Position", "Heading"};
+    private Color color = Color.SALMON;
 
     public QuinticController(Transform[] transforms) {
         this.transforms = new ArrayList<>();
@@ -89,7 +90,7 @@ public class QuinticController extends SplineController {
         renderer.begin(ShapeRenderer.ShapeType.Filled);
 
         // draw spline
-        renderer.setColor(Color.SALMON);
+        renderer.setColor(color);
         for(Vector2 vec : currentSpline) {
             renderer.circle(vec.x, vec.y, ParametricConstants.LINE_WIDTH);
         }
@@ -203,16 +204,6 @@ public class QuinticController extends SplineController {
     }
 
     @Override
-    public SplineProperties getProperties() {
-        return properties;
-    }
-
-    @Override
-    public Path getPath() {
-        return path;
-    }
-
-    @Override
     public void drawProperties(SpriteBatch batch, CameraController cam) {
         this.properties.render(batch, cam);
     }
@@ -227,5 +218,35 @@ public class QuinticController extends SplineController {
         for(Handle h : splineHandles) {
             h.setAllReverse();
         }
+    }
+
+    @Override
+    public ArrayList<Transform> getTransforms() {
+        return transforms;
+    }
+
+    @Override
+    public void writeTo(FileHandle file) {
+
+        Transform[] transforms = new Transform[this.transforms.size()];
+        for(int x = 0; x < this.transforms.size(); x++) {
+            Gdx.app.log("Writing:", "Transform " + (x + 1));
+            Vector2 temp = FieldConstants.getInchVector(new Vector2(
+                    (float) this.transforms.get(x).getPosition().getX(),
+                    (float) this.transforms.get(x).getPosition().getY()));
+            transforms[x] = new Transform(temp.x, temp.y, this.transforms.get(x).getRotation().getHeading());
+        }
+
+        file.writeString("Quintic Hermite ID #" + this.ID + "\n", true);
+        file.writeString("new Transform[] {\n", true);
+        for(int y = 0; y < this.transforms.size(); y++) {
+            file.writeString("\t" + transforms[y].toString() + ",\n", true);
+        }
+        file.writeString("}", true);
+    }
+
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

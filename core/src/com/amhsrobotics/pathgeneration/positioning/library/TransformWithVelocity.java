@@ -43,4 +43,10 @@ public class TransformWithVelocity extends Transform implements WithVelocity {
     public double getVelocity() {
         return velocity;
     }
+
+    @Override
+    public String toString() {
+        return String.format("new TransformWithVelocity(new Transform(new %s, new %s), %s)", getPosition(), getRotation(), velocity);
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.amhsrobotics.pathgeneration.field;
 
+import com.amhsrobotics.pathgeneration.Overlay;
 import com.amhsrobotics.pathgeneration.cameramechanics.CameraController;
+import com.amhsrobotics.pathgeneration.headsup.WaypointProperties;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,12 +24,18 @@ public class Waypoint {
 
     public boolean hovered = false;
 
+    private int ID;
+
     private GlyphLayout layout = new GlyphLayout();
     private DecimalFormat format = new DecimalFormat("##.00");
 
-    public Waypoint(float x, float y, boolean isInInches) {
+    private WaypointProperties properties;
+
+    public Waypoint(float x, float y, int ID, boolean isInInches) {
         this.sprite = new Sprite(new Texture(Gdx.files.internal("field/waypoint.png")));
         this.sprite.setSize(48, 48);
+
+        this.ID = ID;
 
         if(isInInches) {
             Vector2 t = FieldConstants.getImaginaryVector(new Vector2(x, y));
@@ -38,7 +46,8 @@ public class Waypoint {
             centeredPosition = new Vector2(realPosition.x - sprite.getWidth() / 2, realPosition.y - 4);
         }
 
-        sprite.setPosition(centeredPosition.x, centeredPosition.y);
+
+        properties = new WaypointProperties(this);
     }
 
     public Vector2 getPosition() {
@@ -53,6 +62,7 @@ public class Waypoint {
         batch.setProjectionMatrix(cam.getCamera().combined);
         batch.begin();
 
+        sprite.setPosition(centeredPosition.x, centeredPosition.y);
         sprite.draw(batch);
         if(sprite.getBoundingRectangle().contains(unproj.x, unproj.y)) {
             this.hovered = true;
@@ -71,4 +81,17 @@ public class Waypoint {
         return sprite.getBoundingRectangle();
     }
 
+    public int getID() {
+        return ID;
+    }
+
+    public void drawProperties(SpriteBatch batch, CameraController cam) {
+        this.properties.render(batch, cam);
+    }
+
+    public void setPositionFromInches(Vector2 vec) {
+        Vector2 t = FieldConstants.getImaginaryVector(new Vector2(vec.x, vec.y));
+        realPosition = new Vector2(t.x, t.y);
+        centeredPosition = new Vector2(realPosition.x - sprite.getWidth() / 2, realPosition.y - 4);
+    }
 }

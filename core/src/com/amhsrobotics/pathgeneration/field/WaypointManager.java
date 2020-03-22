@@ -24,6 +24,8 @@ public class WaypointManager {
 
     private ArrayList<Waypoint> waypoints;
 
+    private int currentID = 1;
+
     public WaypointManager() {
         this.font = new BitmapFont(Gdx.files.internal("fonts/ari2.fnt"));
 
@@ -33,17 +35,18 @@ public class WaypointManager {
 
     public void render(SpriteBatch batch, CameraController cam) {
 
+        Vector3 unproj = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        cam.getCamera().unproject(unproj);
+
         if(enable) {
-            Vector3 unproj = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            cam.getCamera().unproject(unproj);
 
             cam.setPan(false);
 
-
             boolean en2 = true;
             for(Button b : Overlay.buttonManager.getButtons()) {
-                if(b.hovered) {
+                if (b.hovered) {
                     en2 = false;
+                    break;
                 }
             }
 
@@ -64,6 +67,10 @@ public class WaypointManager {
 
         for(Waypoint w : waypoints) {
             w.render(batch, cam, font);
+            if(w.getRect().contains(unproj.x, unproj.y) && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                Overlay.waypointSelected = w.getID();
+                Overlay.splineSelected = 0;
+            }
         }
 
     }
@@ -80,14 +87,25 @@ public class WaypointManager {
     }
 
     public void addWaypointWithInches(float x, float y) {
-        this.waypoints.add(new Waypoint(x, y, true));
+        this.waypoints.add(new Waypoint(x, y, currentID, true));
+        currentID++;
     }
 
     public void addWaypointWithPixels(float x, float y) {
-        this.waypoints.add(new Waypoint(x, y, false));
+        this.waypoints.add(new Waypoint(x, y, currentID, false));
+        currentID++;
     }
 
     public ArrayList<Waypoint> getWaypoints() {
         return waypoints;
+    }
+
+    public Waypoint getWaypointByID(int ID) {
+        for(Waypoint w : waypoints) {
+            if(w.getID() == ID) {
+                return w;
+            }
+        }
+        return null;
     }
 }

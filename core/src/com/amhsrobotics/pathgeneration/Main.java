@@ -11,8 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import de.tomgrill.gdxdialogs.core.GDXDialogs;
-import de.tomgrill.gdxdialogs.core.GDXDialogsSystem;
 
 public class Main extends ApplicationAdapter {
 
@@ -29,7 +27,11 @@ public class Main extends ApplicationAdapter {
 		stage = new Stage();
 		stage.getRoot().addCaptureListener(new InputListener() {
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				if (!(event.getTarget() instanceof TextField)) stage.setKeyboardFocus(null);
+				if (!(event.getTarget() instanceof TextField)) {
+					stage.setKeyboardFocus(null);
+				} else {
+					stage.setKeyboardFocus(event.getTarget());
+				}
 				return false;
 			}});
 
@@ -41,6 +43,7 @@ public class Main extends ApplicationAdapter {
 		overlay = new Overlay();
 
 		Gdx.input.setInputProcessor(new InputMultiplexer(new InputCore(worldCam), stage));
+
 	}
 
 	@Override
@@ -54,11 +57,11 @@ public class Main extends ApplicationAdapter {
 		overlay.updateAll(batch, worldCam, hudCam);
 
 		stage.act(Gdx.graphics.getDeltaTime());
-		//stage.draw();
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
+		stage.dispose();
 	}
 }

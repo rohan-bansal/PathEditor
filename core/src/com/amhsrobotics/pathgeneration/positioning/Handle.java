@@ -21,6 +21,7 @@ public class Handle {
     private Transform transform;
     private SplineController superClass;
     private Sprite s;
+    public boolean hover = false;
 
     public Handle(Transform t, SplineController splineController) {
 
@@ -38,8 +39,9 @@ public class Handle {
         Vector3 unproj = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         cam.getCamera().unproject(unproj);
 
-        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if(this.s.getBoundingRectangle().contains(unproj.x, unproj.y)) {
+        if(this.s.getBoundingRectangle().contains(unproj.x, unproj.y)) {
+            hover = true;
+            if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 
                 if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
                     for(Waypoint w : Overlay.waypointManager.getWaypoints()) {
@@ -53,13 +55,21 @@ public class Handle {
                     this.transform.setPosition(new Position(unproj.x, unproj.y));
 
                     if(Gdx.input.isKeyPressed(Input.Keys.Z)) {
+                        if(this.transform.getRotation().getHeading() == 0) {
+                            this.transform.setRotation(new Rotation(360));
+                        }
                         this.transform.setRotation(new Rotation(this.transform.getRotation().getHeading() - 2));
                     } else if(Gdx.input.isKeyPressed(Input.Keys.X)) {
+                        if(this.transform.getRotation().getHeading() == 360) {
+                            this.transform.setRotation(new Rotation(0));
+                        }
                         this.transform.setRotation(new Rotation(this.transform.getRotation().getHeading() + 2));
                     }
                 }
             }
             superClass.generate();
+        } else {
+            hover = false;
         }
     }
 

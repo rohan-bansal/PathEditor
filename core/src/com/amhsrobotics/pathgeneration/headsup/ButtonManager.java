@@ -13,6 +13,7 @@ public class ButtonManager {
     public ButtonManager() {
 
         buttons = new ArrayList<Button>() {{
+            add(new Button("Export").setFunction(ButtonFunctions.EXPORT).setCenter(40, Gdx.graphics.getHeight() / 2 + 300));
             add(new Button("Quintic Hermite").setFunction(ButtonFunctions.QUINTIC_HERMITE).setCenter(40, Gdx.graphics.getHeight() / 2 - 50));
             add(new Button("Cubic Hermite").setFunction(ButtonFunctions.CUBIC_HERMITE).setCenter(40, Gdx.graphics.getHeight() / 2 + 10));
             add(new Button("Find Point").setFunction(ButtonFunctions.FIND_POINT).setCenter(40, Gdx.graphics.getHeight() / 2 - 200));

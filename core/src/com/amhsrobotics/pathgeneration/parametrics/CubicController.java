@@ -2,6 +2,7 @@ package com.amhsrobotics.pathgeneration.parametrics;
 
 import com.amhsrobotics.pathgeneration.Overlay;
 import com.amhsrobotics.pathgeneration.cameramechanics.CameraController;
+import com.amhsrobotics.pathgeneration.field.FieldConstants;
 import com.amhsrobotics.pathgeneration.headsup.SplineProperties;
 import com.amhsrobotics.pathgeneration.parametrics.abstractions.SplineController;
 import com.amhsrobotics.pathgeneration.parametrics.libraries.Path;
@@ -11,6 +12,7 @@ import com.amhsrobotics.pathgeneration.positioning.library.Transform;
 import com.amhsrobotics.pathgeneration.positioning.library.TransformWithVelocity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -36,6 +38,7 @@ public class CubicController extends SplineController {
     private Path path;
 
     public String[] fields = new String[] {"X Position", "Y Position", "Heading", "Velocity"};
+    private Color color = Color.SALMON;
 
     public CubicController(TransformWithVelocity[] transforms) {
         this.transforms = new ArrayList<>();
@@ -88,7 +91,7 @@ public class CubicController extends SplineController {
         renderer.begin(ShapeRenderer.ShapeType.Filled);
 
         // draw spline
-        renderer.setColor(Color.SALMON);
+        renderer.setColor(color);
         for(Vector2 vec : currentSpline) {
             renderer.circle(vec.x, vec.y, ParametricConstants.LINE_WIDTH);
         }
@@ -202,16 +205,6 @@ public class CubicController extends SplineController {
     }
 
     @Override
-    public SplineProperties getProperties() {
-        return properties;
-    }
-
-    @Override
-    public Path getPath() {
-        return path;
-    }
-
-    @Override
     public void drawProperties(SpriteBatch batch, CameraController cam) {
         this.properties.render(batch, cam);
     }
@@ -226,5 +219,38 @@ public class CubicController extends SplineController {
         for(Handle h : splineHandles) {
             h.setAllReverse();
         }
+    }
+
+    @Override
+    public ArrayList<Transform> getTransforms() {
+        ArrayList<Transform> temp = new ArrayList<>();
+        for(TransformWithVelocity w : transforms) {
+            temp.add(new Transform(w.getPosition()));
+        }
+        return temp;
+    }
+
+    @Override
+    public void writeTo(FileHandle file) {
+
+        TransformWithVelocity[] transforms = new TransformWithVelocity[this.transforms.size()];
+        for(int x = 0; x < this.transforms.size(); x++) {
+            Gdx.app.log("Writing:", "Transform " + (x + 1));
+            Vector2 temp = FieldConstants.getInchVector(new Vector2(
+                    (float) this.transforms.get(x).getPosition().getX(),
+                    (float) this.transforms.get(x).getPosition().getY()));
+            transforms[x] = new TransformWithVelocity(new Transform(temp.x, temp.y, this.transforms.get(x).getRotation().getHeading()), this.transforms.get(x).getVelocity());
+        }
+
+        file.writeString("Cubic Hermite ID #" + this.ID + "\n", true);
+        file.writeString("new TransformWithVelocity[] {\n", true);
+        for(int y = 0; y < this.transforms.size(); y++) {
+            file.writeString("\t" + transforms[y].toString() + ",\n", true);
+        }
+        file.writeString("}", true);    }
+
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

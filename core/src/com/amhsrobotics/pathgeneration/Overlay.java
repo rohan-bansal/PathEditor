@@ -21,6 +21,7 @@ public class Overlay {
     public static MeasureTool measureTool;
 
     public static int splineSelected = 0;
+    public static int waypointSelected = 0;
 
     public Overlay() {
 
@@ -46,6 +47,8 @@ public class Overlay {
         if(!panel.hidden) {
             if(splineManager.getSplineByID(splineSelected) != null) {
                 splineManager.getSplineByID(splineSelected).drawProperties(batch, hudCam);
+            } else if(waypointManager.getWaypointByID(waypointSelected) != null) {
+                waypointManager.getWaypointByID(waypointSelected).drawProperties(batch, hudCam);
             }
         }
 
