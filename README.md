@@ -33,4 +33,4 @@ Go to the `libs/output-windows` folder and run the EXE
 
 Go to the `libs/output-[mac/linux]` folder and run the respective executable
 
-There is a universal jar file located in `build/libs` that can be run with `java -jar jarfile.jar` as well.
+**There is a universal jar file located in `build/libs` that can be run with `java -jar jarfile.jar` as well.**
