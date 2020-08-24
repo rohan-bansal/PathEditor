@@ -9,7 +9,7 @@ This path editor is a custom Java application made with the LibGDX framework tha
 ### Features
 
 - Can edit paths with commonly used splines (Cubic Hermite + Quintic Hermite)
-- Can export paths directly to code, so all that needs to be done is a bit of copy/pasting
+- Can export paths directly to code, so all that needs to be done is a bit of copy/pasting in context
 - Performance (direct access to OpenGL)
 
 ### Build Instructions
